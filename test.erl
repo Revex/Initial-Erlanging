@@ -34,6 +34,17 @@ listen(OldGpio27, OldGpio9)->
 		false -> sendApi(Gpio9, "9");
 		true -> io:fwrite("change in 9")
 	    end,
+
+            CurrentColor = first:getTheColor(),
+	    if 
+		(CurrentColor =:= "green") ->
+		    gpio:write(24, 1),
+		    gpio:write(25, 1);
+	        (CurrentColor =/= "green") ->
+		    gpio:write(24,0),
+		    gpio:write(25,0)
+	    end,
+
 	    listen(Gpio27, Gpio9)
     end.
 
@@ -61,9 +72,9 @@ setupPins()->
     gpio:write(4, 0),
     gpio:write(17, 1),
     gpio:write(22, 1),
-    gpio:write(10, 1),
-    gpio:write(24, 1),
-    gpio:write(25, 1),
+    gpio:write(10, 0),
+    gpio:write(24, 0),
+    gpio:write(25, 0),
     io:fwrite("Yeah baby, we set it up!   ").
         
 start() ->
