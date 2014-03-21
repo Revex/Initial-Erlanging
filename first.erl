@@ -1,4 +1,4 @@
-%% @author UserX
+
 %% @doc @todo Add description to first.
 
 
@@ -56,26 +56,32 @@ handle(Conn, Num) ->
     io:fwrite("in the handle method \n"),
     {ok, Packet} = gen_tcp:recv(Conn, 0, 5000),
     
-%    {http_request, HttpMethod, HttpUri, HttpVersion} = erlang:decode_packet(http, Packet, []),
-%    io:fwrite(HttpUri),
-%    io:fwrite("   "),
-%    io:fwrite(HttpVersion),
-
     %we must parse the Packet (it is an HTTP request)
     %first lets find out if it is a Get or a Put (we don't care about any other ones)
     
-    HttpMethod = string:substr(Packet, 1, 3),   
-    io:fwrite(HttpMethod),
-%    HttpMethod = "GET",
-
+    HttpMethod = string:substr(Packet, 1, 4),   
     if 
-	HttpMethod =:= "GET" ->
-	    gen_tcp:send(Conn, response("Yo Baby its gravy " ++ Num ++ " <br/><br/><br/> "++ Packet ++ "<br /><br /><br /> "));
-	HttpMethod =:= "PUT" ->
+	HttpMethod =:= "GET " ->
+	    gen_tcp:send(Conn, response("Yo Baby its gravy " ++ Num ++ " <br/><br/><br/> "++ Packet ++ "<br /><br /><br />
+<form> 
+Entry: <input type='text' name='MyEntry' /> 
+<input type='submit' />
+</form>
+
+
+ "));
+	HttpMethod =:= "PUT " ->
 	    PositionBeforeHttp = string:str(Packet, " HTTP/1") - string:len(" HTTP/1") + 2,
 	    Request = string:substr(Packet, 5, PositionBeforeHttp),
 	    first:setTheColor(string:substr(Request,2)),
-	    gen_tcp:send(Conn, response("Yeah we set it, up for ya"))
+	    gen_tcp:send(Conn, response("Yeah we set it, up for ya"));
+	HttpMethod =:= "POST" ->
+	    PositionBeforeHttp = string:str(Packet, " HTTP/1") - string:len(" HTTP/1") + 2,
+	    Request = string:substr(Packet, 6, PositionBeforeHttp),
+	    io:fwrite(Request),
+	    gen_tcp:send(Conn, response("we see you posted  this: <br/>"++Request))
+	   
+%TODO if a HttpMethod is not get or put it will cause an error, fix that
    end,
     
     gen_tcp:close(Conn),
