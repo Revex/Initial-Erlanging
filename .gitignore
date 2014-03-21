@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ct_run*
 index.html
 jquery-latest.js
@@ -16,3 +17,11 @@ dump_excludes
 dump_to_pi
 sync_excludes
 sync_to_pi
+=======
+.eunit
+deps
+*.o
+*.beam
+*.plt
+erl_crash.dump
+>>>>>>> 8b0ce1c206a74e6395e59aacfb50a37c35e7b843

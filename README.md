@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 erlang-ale -- Erlang Actor Library for Embedded
 =====
 
@@ -64,3 +65,7 @@ A more detailed usage of the GPIO module can be found in
     See the License for the specific language governing permissions and
     limitations under the License.
 
+=======
+Initial-Erlanging
+=================
+>>>>>>> 8b0ce1c206a74e6395e59aacfb50a37c35e7b843
