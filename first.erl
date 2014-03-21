@@ -16,7 +16,7 @@ start(Port) ->
 
     loop(Sock) 
 	end),
-	register(myColor, spawn(firstModule, color, ["blue"])),
+	register(myColor, spawn(first, color, ["blue"])),
 	getTheColor().
 
 getTheColor()->
@@ -33,7 +33,7 @@ getTheColor()->
 	    false -> 
 			TheColor = "blue",
 			io:fwrite("Color process had died, we restarted it with default value of: " ++ TheColor),
-			register(myColor, spawn(firstModule, color, [TheColor]))
+			register(myColor, spawn(first, color, [TheColor]))
 	end,
 	TheColor.
 
@@ -47,16 +47,39 @@ setTheColor(NewColor)->
 
 loop(Sock) ->
     {ok, Conn} = gen_tcp:accept(Sock),
-	TheColor = getTheColor(),
-	Handler = spawn(fun () -> handle(Conn,TheColor) end),
+    TheColor = getTheColor(),
+    Handler = spawn(fun () -> handle(Conn,TheColor) end),
     gen_tcp:controlling_process(Conn, Handler),
     loop(Sock).
 
 handle(Conn, Num) ->
-	io:fwrite("in the handle method \n"),
-	{ok, Packet} = gen_tcp:recv(Conn, 0, 5000),
-    gen_tcp:send(Conn, response("Yo Baby its gravy " ++ Num ++ " <br/><br/><br/> "++ Packet)),
-    gen_tcp:close(Conn).
+    io:fwrite("in the handle method \n"),
+    {ok, Packet} = gen_tcp:recv(Conn, 0, 5000),
+    
+%    {http_request, HttpMethod, HttpUri, HttpVersion} = erlang:decode_packet(http, Packet, []),
+%    io:fwrite(HttpUri),
+%    io:fwrite("   "),
+%    io:fwrite(HttpVersion),
+
+    %we must parse the Packet (it is an HTTP request)
+    %first lets find out if it is a Get or a Put (we don't care about any other ones)
+    
+    HttpMethod = string:substr(Packet, 1, 3),   
+    io:fwrite(HttpMethod),
+%    HttpMethod = "GET",
+
+    if 
+	HttpMethod =:= "GET" ->
+	    gen_tcp:send(Conn, response("Yo Baby its gravy " ++ Num ++ " <br/><br/><br/> "++ Packet ++ "<br /><br /><br /> "));
+	HttpMethod =:= "PUT" ->
+	    PositionBeforeHttp = string:str(Packet, " HTTP/1") - string:len(" HTTP/1") + 2,
+	    Request = string:substr(Packet, 5, PositionBeforeHttp),
+	    first:setTheColor(string:substr(Request,2)),
+	    gen_tcp:send(Conn, response("Yeah we set it, up for ya"))
+   end,
+    
+    gen_tcp:close(Conn),
+    Packet.
 
 
 color(OldColor) ->
