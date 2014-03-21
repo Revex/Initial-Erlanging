@@ -58,7 +58,7 @@ doHeartbeater()->
 
 setupPins()->
     gpio_sup:start_link([{4, output}, {17, output}, {27, input}, {22, output}, {10, output}, {9, input}, {24, output}, {25, output}]),
-    gpio:write(4, 1),
+    gpio:write(4, 0),
     gpio:write(17, 1),
     gpio:write(22, 1),
     gpio:write(10, 1),
