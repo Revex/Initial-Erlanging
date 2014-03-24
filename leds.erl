@@ -5,9 +5,24 @@
 listen(OldGpio27, OldGpio9)->
     receive
 	finished ->
-	    io:fwrite("Finished Listening for messages. ")
+	    io:fwrite("Finished Listening for messages. ");
+	{change_led, PinNumber} ->
+	    CurrentLedValue = gpio:read(PinNumber),
+	    case CurrentLedValue of
+		0 -> gpio:write(PinNumber, 1);
+		1 -> gpio:write(PinNumber, 0);
+		_ -> io:fwrite("There seems to be an error reading Pin")
+	    end;
+	{is_pin_on, PinNumber, PidOfCaller}->
+	    IsPinOn = gpio:read(PinNumber),
+	    case IsPinOn of
+		0 -> AtomOfPinOn = false;
+		1 -> AtomOfPinOn = true;
+		_ -> AtomOfPinOn = null
+	    end,
+	    PidOfCaller ! {led_pin_result, PinNumber, AtomOfPinOn}
     after 
-	500  ->
+	100  ->
 	    io:fwrite("inside listen method.   "),
 	    Gpio27 = gpio:read(27),
 	    R = io_lib:format("~p", [Gpio27]),
