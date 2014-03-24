@@ -7,19 +7,18 @@
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([hello_world/0, start/1, getTheColor/0, setTheColor/1, color/1, loadGpioCode/0]).
+-export([start/0, start/1, getTheColor/0, setTheColor/1, color/1]).
 
-hello_world() -> io:fwrite("hello, you smelly world\n").
+start()->
+    start("bah").
 
-loadGpioCode()->
-    code:add_pathsz(["deps/erlang_portutil/ebin", "deps/gproc/ebin", "deps/meck/ebin", "deps/pihwm/ebin", "ebin", "examples"]).
-
-start(Port) ->
+start(Nothing) ->
+    Port = 80,
     spawn(fun () -> {ok, Sock} = gen_tcp:listen(Port, [{active, false}]),
 
     loop(Sock) 
 	end),
-	register(myColor, spawn(first, color, ["blue"])),
+	register(myColor, spawn(webs, color, ["blue"])),
 	getTheColor().
 
 getTheColor()->
@@ -36,7 +35,7 @@ getTheColor()->
 	    false -> 
 			TheColor = "blue",
 			io:fwrite("Color process had died, we restarted it with default value of: " ++ TheColor),
-			register(myColor, spawn(first, color, [TheColor]))
+			register(myColor, spawn(webs, color, [TheColor]))
 	end,
 	TheColor.
 
