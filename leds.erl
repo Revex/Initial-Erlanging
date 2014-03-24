@@ -1,4 +1,4 @@
--module(test).
+-module(leds).
 
 -export([start/0, listen/2, sendApi/2, sendHeartbeat/0, doHeartbeater/0, setupPins/0]).
 

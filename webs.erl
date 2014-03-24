@@ -2,7 +2,7 @@
 %% @doc @todo Add description to first.
 
 
--module(first).
+-module(webs).
 
 %% ====================================================================
 %% API functions
@@ -62,12 +62,11 @@ handle(Conn, Num) ->
     HttpMethod = string:substr(Packet, 1, 4),   
     if 
 	HttpMethod =:= "GET " ->
-	    gen_tcp:send(Conn, response("Yo Baby its gravy " ++ Num ++ " <br/><br/><br/> "++ Packet ++ "<br /><br /><br />
-<form> 
+	    gen_tcp:send(Conn, response("Yo Baby its gravy, and the values is: <h2>" ++ Num ++ "</h2><br /><br /><br />
+<form method='POST'> 
 Entry: <input type='text' name='MyEntry' /> 
 <input type='submit' />
 </form>
-
 
  "));
 	HttpMethod =:= "PUT " ->
@@ -76,10 +75,22 @@ Entry: <input type='text' name='MyEntry' />
 	    first:setTheColor(string:substr(Request,2)),
 	    gen_tcp:send(Conn, response("Yeah we set it, up for ya"));
 	HttpMethod =:= "POST" ->
-	    PositionBeforeHttp = string:str(Packet, " HTTP/1") - string:len(" HTTP/1") + 2,
-	    Request = string:substr(Packet, 6, PositionBeforeHttp),
-	    io:fwrite(Request),
-	    gen_tcp:send(Conn, response("we see you posted  this: <br/>"++Request))
+	    Request = string:substr(Packet, 6),
+		Property = "MyEntry=",
+		io:fwrite("I'm in the post method handler\n"),
+		PositionOfMyEntry = string:rstr(Request, Property),
+		LengthOfMyEntry = string:len(Property),
+		io:fwrite("This is the positionfoMyEntry: "++erlang:integer_to_list(PositionOfMyEntry)),
+		MyEntry = string:substr(Request, PositionOfMyEntry + LengthOfMyEntry),
+	    io:fwrite(MyEntry),
+	    gen_tcp:send(Conn, response("We see you posted  this: <br/>"
+								   ++MyEntry 
+								   ++ "<br /><br /><h2>So we changed the value to "
+								   ++MyEntry
+								   ++"!!</h2><br /><br /><br /><br /> <a href='/'>Click to Check and See</a>"
+								   ++"<br/><br/><br/>"
+								   ++Packet)),
+		webs:setTheColor(MyEntry)
 	   
 %TODO if a HttpMethod is not get or put it will cause an error, fix that
    end,
