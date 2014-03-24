@@ -1,15 +1,18 @@
 
-%% @doc @todo Add description to first.
-
+%% @doc this module starts up a very basic web server, and allows a value change.  
+%% @doc it's purpose is a proof of concept for interacting with GPIO pins on a raspberry pi remotely.
 
 -module(webs).
 
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([hello_world/0, start/1, getTheColor/0, setTheColor/1, color/1]).
+-export([hello_world/0, start/1, getTheColor/0, setTheColor/1, color/1, loadGpioCode/0]).
 
 hello_world() -> io:fwrite("hello, you smelly world\n").
+
+loadGpioCode()->
+    code:add_pathsz(["deps/erlang_portutil/ebin", "deps/gproc/ebin", "deps/meck/ebin", "deps/pihwm/ebin", "ebin", "examples"]).
 
 start(Port) ->
     spawn(fun () -> {ok, Sock} = gen_tcp:listen(Port, [{active, false}]),

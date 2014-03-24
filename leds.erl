@@ -35,7 +35,7 @@ listen(OldGpio27, OldGpio9)->
 		true -> io:fwrite("change in 9")
 	    end,
 
-            CurrentColor = first:getTheColor(),
+            CurrentColor = webs:getTheColor(),
 	    if 
 		(CurrentColor =:= "green") ->
 		    gpio:write(24, 1),
@@ -77,11 +77,18 @@ setupPins()->
     gpio:write(25, 0),
     io:fwrite("Yeah baby, we set it up!   ").
         
+loadGpioFiles()->
+    code:add_pathsz(["deps/erlang_portutil/ebin", "deps/gproc/ebin", "deps/meck/ebin", "deps/pihwm/ebin", "ebin", "examples"]).
+
+
 start() ->
-    setupPins(), 
-    io:fwrite("Gonna create process and set it to start listening to the interrupt  "),   
+    loadGpioFiles(),
+    setupPins(),
+    io:fwrite("Gonna create process and set it to start listening for button presses  "),   
     inets:start(),
+    io:fwrite("getting initial gpio value "),
     InitialGpio27 = gpio:read(27),
+    io:fwrite("the value is: "++ integer_to_list(InitialGpio27)),
     InitialGpio9 = gpio:read(9),
     sendApi(InitialGpio27, "27"), %send an initial pin value to change any previously stored value
     sendApi(InitialGpio9, "9"),
